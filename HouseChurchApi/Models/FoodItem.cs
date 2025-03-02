@@ -6,7 +6,5 @@
         public string Item { get; set; }
         public string BroughtBy { get; set; }
         public int EventId { get; set; } // Links to a specific event
-        public Event Event { get; set; } // Navigation property to the related Event
     }
-
 }

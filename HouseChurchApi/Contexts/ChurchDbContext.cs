@@ -10,13 +10,5 @@ namespace HouseChurchApi.Contexts
         public DbSet<FoodItem> FoodItems { get; set; }
 
         public ChurchDbContext(DbContextOptions<ChurchDbContext> options) : base(options) { }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<FoodItem>()
-                .HasOne(f => f.Event)
-                .WithMany(e => e.FoodItems)
-                .HasForeignKey(f => f.EventId);
-        }
     }
 }
