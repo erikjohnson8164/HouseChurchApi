@@ -1,36 +1,41 @@
 ﻿using HouseChurchApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using HouseChurchApi.Interfaces;
+using HouseChurchApi.RepositoryClasses;
 
 
 namespace HouseChurchApi.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
-    public class FoodItemController : ControllerBase
+    [ApiController]
+    public class FoodItemsController : ControllerBase
     {
-        private readonly IPrayerRequestRepository _prayerRequestRepository;
-        public FoodItemController(IPrayerRequestRepository prayerRequestRepository)
+        private readonly IFoodItemRepository _foodItemRepository;
+
+        public FoodItemsController(IFoodItemRepository foodItemRepository)
         {
-            _prayerRequestRepository = prayerRequestRepository;
+            _foodItemRepository = foodItemRepository;
         }
+
         [HttpGet]
-        public async Task<IActionResult> GetPrayerRequest()
+        public async Task<ActionResult<IEnumerable<FoodItem>>> GetFoodItems()
         {
-            var events = await _prayerRequestRepository.GetPrayerRequests();
-            return Ok(events);
+            var foodItems = await _foodItemRepository.GetAllFoodItems();
+            return Ok(foodItems);
         }
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePrayerRequest(int id)
-        {
-            await _prayerRequestRepository.DeletePrayerRequest(id);
-            return NoContent(); // 204 on successful deletion
-        }
+
         [HttpPost]
-        public async Task<IActionResult> AddPrayerRequest([FromBody] PrayerRequest newPrayerRequest)
+        public async Task<ActionResult<FoodItem>> CreateFoodItem(FoodItem foodItem)
         {
-            await _prayerRequestRepository.AddPrayerRequest(newPrayerRequest);
-            return CreatedAtAction(nameof(GetPrayerRequest), new { id = newPrayerRequest.Id }, newPrayerRequest);
+            var createdFoodItem = await _foodItemRepository.AddFoodItem(foodItem);
+            return CreatedAtAction(nameof(GetFoodItems), new { id = createdFoodItem.Id }, createdFoodItem);
+        }
+        [HttpDelete]
+        public async Task<IActionResult> DeleteFoodItem(int id)
+        {
+            await _foodItemRepository.DeleteFoodItem(id);
+            return NoContent(); // 204 on successful deletion
         }
     }
 }
+

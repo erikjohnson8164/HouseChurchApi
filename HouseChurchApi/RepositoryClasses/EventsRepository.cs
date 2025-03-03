@@ -1,4 +1,5 @@
 ﻿using HouseChurchApi.Contexts;
+using HouseChurchApi.Dtos;
 using HouseChurchApi.Interfaces;
 using HouseChurchApi.Models;
 using Microsoft.EntityFrameworkCore;
@@ -12,10 +13,25 @@ namespace HouseChurchApi.RepositoryClasses
         {
             _churchDbContext = churchDbContext;
         }
-        public async Task<List<Event>> GetAllEvents()
+        public async Task<List<EventDto>> GetAllEvents()
         {
-            var events = await _churchDbContext.Events.ToListAsync();
-            return events;
+            return await _churchDbContext.Events
+                .Include(e => e.FoodItems)
+                .Select(e => new EventDto
+                {
+                    Id = e.Id,
+                    Title = e.Title,
+                    Date = e.Date,
+                    Location = e.Location,
+                    FoodItems = e.FoodItems.Select(f => new FoodItemDto
+                    {
+                        Id = f.Id,
+                        Item = f.Item,
+                        BroughtBy = f.BroughtBy,
+                        EventId = f.EventId
+                    }).ToList()
+                })
+                .ToListAsync();
         }
         public async Task<bool> DeleteEvent(int id)
         {
